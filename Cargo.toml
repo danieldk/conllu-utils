@@ -11,6 +11,7 @@ path = "src/main.rs"
 [dependencies]
 clap = "2"
 conllu = "0.2"
+flate2 = "1"
 stdinout = "0.4"
 rand = "0.7"
 rand_xorshift = "0.2"

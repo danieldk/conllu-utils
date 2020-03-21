@@ -2,6 +2,7 @@ use std::io::stdout;
 
 use clap::{crate_version, App, AppSettings, Arg, Shell, SubCommand};
 
+pub mod io;
 pub mod subcommands;
 pub mod traits;
 
@@ -15,7 +16,10 @@ static DEFAULT_CLAP_SETTINGS: &[AppSettings] = &[
 
 fn main() {
     // Known subapplications.
-    let apps = vec![subcommands::ShuffleApp::app()];
+    let apps = vec![
+        subcommands::PartitionApp::app(),
+        subcommands::ShuffleApp::app(),
+    ];
 
     let cli = App::new("conllu")
         .settings(DEFAULT_CLAP_SETTINGS)
@@ -38,6 +42,9 @@ fn main() {
                 .value_of("shell")
                 .unwrap();
             write_completion_script(cli, shell.parse::<Shell>().unwrap());
+        }
+        "partition" => {
+            subcommands::PartitionApp::parse(matches.subcommand_matches("partition").unwrap()).run()
         }
         "shuffle" => {
             subcommands::ShuffleApp::parse(matches.subcommand_matches("shuffle").unwrap()).run()
