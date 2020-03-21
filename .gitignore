@@ -1,0 +1,6 @@
+/target
+
+# Editor files
+.*
+
+result*
