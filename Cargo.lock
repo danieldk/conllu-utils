@@ -88,7 +88,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b507802f4f7ca1f7822fdced03a23e0afef5d82eb6a6ec363dfcd73766f8686"
 dependencies = [
  "failure",
- "itertools",
+ "itertools 0.8.2",
  "petgraph",
 ]
 
@@ -99,6 +99,7 @@ dependencies = [
  "clap",
  "conllu",
  "flate2",
+ "itertools 0.9.0",
  "rand",
  "rand_xorshift",
  "stdinout",
@@ -184,6 +185,15 @@ name = "itertools"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f56a2d0bc861f9165be4eb3442afd3c236d8a98afd426f65d92324ae1091a484"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "284f18f85651fe11e8a991b2adb42cb078325c996ed026d994719efcfca1d54b"
 dependencies = [
  "either",
 ]

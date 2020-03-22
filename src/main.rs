@@ -3,6 +3,7 @@ use std::io::stdout;
 use clap::{crate_version, App, AppSettings, Arg, Shell, SubCommand};
 
 pub mod io;
+pub mod layer;
 pub mod subcommands;
 pub mod traits;
 
@@ -19,6 +20,7 @@ fn main() {
     let apps = vec![
         subcommands::PartitionApp::app(),
         subcommands::ShuffleApp::app(),
+        subcommands::ToTextApp::app(),
     ];
 
     let cli = App::new("conllu")
@@ -48,6 +50,9 @@ fn main() {
         }
         "shuffle" => {
             subcommands::ShuffleApp::parse(matches.subcommand_matches("shuffle").unwrap()).run()
+        }
+        "to-text" => {
+            subcommands::ToTextApp::parse(matches.subcommand_matches("to-text").unwrap()).run()
         }
         _unknown => unreachable!(),
     }
