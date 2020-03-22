@@ -1,8 +1,18 @@
 [package]
 name = "conllu-utils"
 version = "0.1.0"
-authors = ["Daniël de Kok <me@danieldk.eu>"]
 edition = "2018"
+authors = ["Daniël de Kok <me@danieldk.eu>"]
+description = "Utilities for working with the CoNLL-U dependency format"
+documentation = "https://github.com/danieldk/conllu-utils"
+repository = "https://github.com/danieldk/conllu-utils.git"
+license = "Apache-2.0"
+readme = "README.md"
+exclude = [
+  ".gitignore",
+  ".github/",
+  "shell.nix"
+]
 
 [[bin]]
 name = "conllu"
