@@ -18,6 +18,7 @@ static DEFAULT_CLAP_SETTINGS: &[AppSettings] = &[
 fn main() {
     // Known subapplications.
     let apps = vec![
+        subcommands::FromTextApp::app(),
         subcommands::PartitionApp::app(),
         subcommands::ShuffleApp::app(),
         subcommands::ToTextApp::app(),
@@ -44,6 +45,9 @@ fn main() {
                 .value_of("shell")
                 .unwrap();
             write_completion_script(cli, shell.parse::<Shell>().unwrap());
+        }
+        "from-text" => {
+            subcommands::FromTextApp::parse(matches.subcommand_matches("from-text").unwrap()).run()
         }
         "partition" => {
             subcommands::PartitionApp::parse(matches.subcommand_matches("partition").unwrap()).run()
