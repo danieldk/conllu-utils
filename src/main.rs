@@ -63,5 +63,5 @@ fn main() {
 }
 
 fn write_completion_script(mut cli: App, shell: Shell) {
-    cli.gen_completions_to("sticker", shell, &mut stdout());
+    cli.gen_completions_to("conllu", shell, &mut stdout());
 }
