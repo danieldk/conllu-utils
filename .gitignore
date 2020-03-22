@@ -2,5 +2,7 @@
 
 # Editor files
 .*
+*~
 
+# Nix results
 result*
