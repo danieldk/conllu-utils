@@ -6,6 +6,7 @@ pub mod io;
 pub mod layer;
 pub mod subcommands;
 pub mod traits;
+pub mod unicode;
 
 use traits::ConlluApp;
 
@@ -18,6 +19,7 @@ static DEFAULT_CLAP_SETTINGS: &[AppSettings] = &[
 fn main() {
     // Known subapplications.
     let apps = vec![
+        subcommands::CleanupApp::app(),
         subcommands::FromTextApp::app(),
         subcommands::PartitionApp::app(),
         subcommands::ShuffleApp::app(),
@@ -45,6 +47,9 @@ fn main() {
                 .value_of("shell")
                 .unwrap();
             write_completion_script(cli, shell.parse::<Shell>().unwrap());
+        }
+        "cleanup" => {
+            subcommands::CleanupApp::parse(matches.subcommand_matches("cleanup").unwrap()).run()
         }
         "from-text" => {
             subcommands::FromTextApp::parse(matches.subcommand_matches("from-text").unwrap()).run()
