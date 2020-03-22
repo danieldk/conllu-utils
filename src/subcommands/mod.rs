@@ -1,3 +1,6 @@
+mod from_text;
+pub use from_text::FromTextApp;
+
 mod partition;
 pub use partition::PartitionApp;
 
