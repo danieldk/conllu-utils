@@ -1,6 +1,9 @@
 mod from_text;
 pub use from_text::FromTextApp;
 
+mod merge;
+pub use merge::MergeApp;
+
 mod partition;
 pub use partition::PartitionApp;
 

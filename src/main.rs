@@ -19,6 +19,7 @@ fn main() {
     // Known subapplications.
     let apps = vec![
         subcommands::FromTextApp::app(),
+        subcommands::MergeApp::app(),
         subcommands::PartitionApp::app(),
         subcommands::ShuffleApp::app(),
         subcommands::ToTextApp::app(),
@@ -49,6 +50,7 @@ fn main() {
         "from-text" => {
             subcommands::FromTextApp::parse(matches.subcommand_matches("from-text").unwrap()).run()
         }
+        "merge" => subcommands::MergeApp::parse(matches.subcommand_matches("merge").unwrap()).run(),
         "partition" => {
             subcommands::PartitionApp::parse(matches.subcommand_matches("partition").unwrap()).run()
         }
