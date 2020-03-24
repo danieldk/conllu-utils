@@ -83,9 +83,9 @@ dependencies = [
 
 [[package]]
 name = "conllu"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b507802f4f7ca1f7822fdced03a23e0afef5d82eb6a6ec363dfcd73766f8686"
+checksum = "9dee5dd5b0b56cc292948eac948265b1f464bbd8b8bb1711b949624c8e4564b9"
 dependencies = [
  "failure",
  "itertools 0.8.2",
