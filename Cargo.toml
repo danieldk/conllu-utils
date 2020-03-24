@@ -20,7 +20,7 @@ path = "src/main.rs"
 
 [dependencies]
 clap = "2"
-conllu = "0.2"
+conllu = "0.3"
 flate2 = "1"
 itertools = "0.9"
 stdinout = "0.4"

@@ -1,14 +1,12 @@
 use std::borrow::Cow;
 
-use conllu::token::{Features, Token};
+use conllu::token::Token;
 
 pub type LayerCallback = Box<dyn Fn(&Token) -> Option<Cow<str>>>;
 
 pub fn layer_callback(layer: &str) -> Option<LayerCallback> {
     match layer {
-        "features" => Some(Box::new(|t| {
-            t.features().map(Features::to_string).map(Cow::Owned)
-        })),
+        "features" => Some(Box::new(|t| Some(Cow::Owned(t.features().to_string())))),
         "form" => Some(Box::new(|t| Some(Cow::Borrowed(t.form())))),
         "lemma" => Some(Box::new(|t| t.lemma().map(Cow::Borrowed))),
         "upos" => Some(Box::new(|t| t.upos().map(Cow::Borrowed))),
