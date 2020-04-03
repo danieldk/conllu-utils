@@ -98,6 +98,7 @@ version = "0.1.3"
 dependencies = [
  "clap",
  "conllu",
+ "failure",
  "flate2",
  "itertools 0.9.0",
  "rand",

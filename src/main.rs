@@ -19,6 +19,7 @@ static DEFAULT_CLAP_SETTINGS: &[AppSettings] = &[
 fn main() {
     // Known subapplications.
     let apps = vec![
+        subcommands::AccuracyApp::app(),
         subcommands::CleanupApp::app(),
         subcommands::FromTextApp::app(),
         subcommands::MergeApp::app(),
@@ -41,6 +42,9 @@ fn main() {
     let matches = cli.clone().get_matches();
 
     match matches.subcommand_name().unwrap() {
+        "accuracy" => {
+            subcommands::AccuracyApp::parse(matches.subcommand_matches("accuracy").unwrap()).run()
+        }
         "completions" => {
             let shell = matches
                 .subcommand_matches("completions")

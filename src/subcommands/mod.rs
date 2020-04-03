@@ -1,3 +1,6 @@
+mod accuracy;
+pub use accuracy::AccuracyApp;
+
 mod cleanup;
 pub use cleanup::CleanupApp;
 
