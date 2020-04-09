@@ -82,10 +82,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "conllu"
-version = "0.3.0"
+name = "colored"
+version = "1.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9dee5dd5b0b56cc292948eac948265b1f464bbd8b8bb1711b949624c8e4564b9"
+checksum = "f4ffc801dacf156c5854b9df4f425a626539c3a6ef7893cc0c5084a23f0b6c59"
+dependencies = [
+ "atty",
+ "lazy_static",
+ "winapi",
+]
+
+[[package]]
+name = "conllu"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "815a564ad2473ee7a159027b9b36a81e6b1abf51f94fd576560f85ce203bd3a1"
 dependencies = [
  "failure",
  "itertools 0.8.2",
@@ -97,6 +108,7 @@ name = "conllu-utils"
 version = "0.1.3"
 dependencies = [
  "clap",
+ "colored",
  "conllu",
  "failure",
  "flate2",
@@ -200,6 +212,12 @@ checksum = "284f18f85651fe11e8a991b2adb42cb078325c996ed026d994719efcfca1d54b"
 dependencies = [
  "either",
 ]
+
+[[package]]
+name = "lazy_static"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
