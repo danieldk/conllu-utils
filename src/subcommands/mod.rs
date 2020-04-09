@@ -4,6 +4,9 @@ pub use accuracy::AccuracyApp;
 mod cleanup;
 pub use cleanup::CleanupApp;
 
+mod compare;
+pub use compare::CompareApp;
+
 mod from_text;
 pub use from_text::FromTextApp;
 

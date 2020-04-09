@@ -21,6 +21,7 @@ fn main() {
     let apps = vec![
         subcommands::AccuracyApp::app(),
         subcommands::CleanupApp::app(),
+        subcommands::CompareApp::app(),
         subcommands::FromTextApp::app(),
         subcommands::MergeApp::app(),
         subcommands::PartitionApp::app(),
@@ -55,6 +56,9 @@ fn main() {
         }
         "cleanup" => {
             subcommands::CleanupApp::parse(matches.subcommand_matches("cleanup").unwrap()).run()
+        }
+        "compare" => {
+            subcommands::CompareApp::parse(matches.subcommand_matches("compare").unwrap()).run()
         }
         "from-text" => {
             subcommands::FromTextApp::parse(matches.subcommand_matches("from-text").unwrap()).run()
