@@ -1,8 +1,7 @@
-use std::process;
-
+use anyhow::{ensure, Context, Result};
 use clap::{App, Arg, ArgMatches};
 use conllu::io::{PartitioningWriter, Reader, WriteSentence};
-use stdinout::{Input, OrExit};
+use stdinout::Input;
 
 use crate::io::open_writer;
 use crate::traits::ConlluApp;
@@ -42,49 +41,49 @@ impl ConlluApp for PartitionApp {
             .arg(Arg::with_name(INPUT).help("Treebank to partition"))
     }
 
-    fn parse(matches: &ArgMatches) -> Self {
+    fn parse(matches: &ArgMatches) -> Result<Self> {
         let input = Input::from(matches.value_of(INPUT));
-        let n_parts = matches.value_of(N_PARTS).unwrap().parse().or_exit(
-            format!(
-                "Number of parts could not be parsed as an integer: {}",
-                matches.value_of(N_PARTS).unwrap()
-            ),
-            1,
-        );
+        let n_parts = matches.value_of(N_PARTS).unwrap().parse().context(format!(
+            "Number of parts could not be parsed as an integer: {}",
+            matches.value_of(N_PARTS).unwrap()
+        ))?;
 
-        if n_parts == 0 {
-            eprintln!("Cannot split the corpus into zero partitions");
-            process::exit(1);
-        }
+        ensure!(n_parts != 0, "Cannot split the corpus into zero partitions");
 
         let prefix = matches.value_of(PREFIX).unwrap().to_owned();
         let suffix = matches.value_of(SUFFIX).unwrap().to_owned();
 
-        PartitionApp {
+        Ok(PartitionApp {
             input,
             n_parts,
             prefix,
             suffix,
-        }
+        })
     }
 
-    fn run(&self) {
-        let reader = Reader::new(self.input.buf_read().or_exit("Cannot open input corpus", 1));
+    fn run(&self) -> Result<()> {
+        let reader = Reader::new(
+            self.input
+                .buf_read()
+                .context("Cannot open input treebank")?,
+        );
 
-        let writers: Vec<_> = (0..self.n_parts)
+        let writers = (0..self.n_parts)
             .map(|part| {
                 open_writer(&format!("{}{}{}", self.prefix, part, self.suffix))
-                    .or_exit(format!("Cannot open writer for partition {}", part), 1)
+                    .context(format!("Cannot open writer for partition {}", part))
             })
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
 
         let mut writer = PartitioningWriter::new(writers);
 
         for sentence in reader {
-            let sentence = sentence.or_exit("Cannot parse sentence", 1);
+            let sentence = sentence.context("Cannot parse sentence")?;
             writer
                 .write_sentence(&sentence)
-                .or_exit("Cannot write sentence", 1);
+                .context("Cannot write sentence")?;
         }
+
+        Ok(())
     }
 }

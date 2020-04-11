@@ -2,11 +2,11 @@ use std::borrow::Cow;
 use std::fs::File;
 use std::io::BufReader;
 
+use anyhow::{bail, ensure, format_err, Context, Result};
 use clap::{App, Arg, ArgGroup, ArgMatches};
 use conllu::graph::{Node, Sentence};
 use conllu::io::Reader;
-use failure::{bail, ensure, format_err, Error, ResultExt};
-use stdinout::OrExit;
+use conllu::IOError;
 use unicode_categories::UnicodeCategories;
 
 use crate::layer::{layer_callback, LayerCallback};
@@ -67,7 +67,7 @@ impl ConlluApp for AccuracyApp {
             )
     }
 
-    fn parse(matches: &ArgMatches) -> Self {
+    fn parse(matches: &ArgMatches) -> Result<Self> {
         let gold_treebank = matches.value_of(GOLD_TREEBANK).unwrap().to_owned();
         let predicted_treebank = matches.value_of(PREDICTED_TREEBANK).unwrap().to_owned();
 
@@ -77,34 +77,31 @@ impl ConlluApp for AccuracyApp {
             matches.value_of(FEATURE),
         ) {
             (false, Some(layer), None) => Evaluation::Callbacks(
-                process_layer_callbacks(layer).or_exit("Cannot parse layer(s)", 1),
+                process_layer_callbacks(layer).context("Cannot parse layer(s)")?,
             ),
             (false, None, Some(feature)) => Evaluation::Callbacks(vec![feature_callback(feature)]),
             (true, None, None) => Evaluation::AttachmentScore,
             _ => unreachable!(),
         };
 
-        AccuracyApp {
+        Ok(AccuracyApp {
             evaluation,
             gold_treebank,
             predicted_treebank,
-        }
+        })
     }
 
-    fn run(&self) {
-        let gold_file = File::open(&self.gold_treebank).or_exit(
-            format!("Cannot open gold standard treebank: {}", self.gold_treebank),
-            1,
-        );
+    fn run(&self) -> Result<()> {
+        let gold_file = File::open(&self.gold_treebank).context(format!(
+            "Cannot open gold standard treebank: {}",
+            self.gold_treebank
+        ))?;
         let gold_reader = Reader::new(BufReader::new(gold_file));
 
-        let predicted_file = File::open(&self.predicted_treebank).or_exit(
-            format!(
-                "Cannot open predicted treebank: {}",
-                self.predicted_treebank
-            ),
-            1,
-        );
+        let predicted_file = File::open(&self.predicted_treebank).context(format!(
+            "Cannot open predicted treebank: {}",
+            self.predicted_treebank
+        ))?;
         let predicted_reader = Reader::new(BufReader::new(predicted_file));
 
         match &self.evaluation {
@@ -113,15 +110,14 @@ impl ConlluApp for AccuracyApp {
             }
             Evaluation::AttachmentScore => dependency_eval(gold_reader, predicted_reader),
         }
-        .or_exit("Cannot compute accuracy", 1)
     }
 }
 
 fn callback_eval(
-    reader1: impl IntoIterator<Item = Result<Sentence, Error>>,
-    reader2: impl IntoIterator<Item = Result<Sentence, Error>>,
+    reader1: impl IntoIterator<Item = Result<Sentence, IOError>>,
+    reader2: impl IntoIterator<Item = Result<Sentence, IOError>>,
     diff_callbacks: &[LayerCallback],
-) -> Result<(), Error> {
+) -> Result<()> {
     let mut total = 0;
     let mut correct = 0;
 
@@ -164,9 +160,9 @@ fn callback_eval(
 }
 
 fn dependency_eval(
-    reader1: impl IntoIterator<Item = Result<Sentence, Error>>,
-    reader2: impl IntoIterator<Item = Result<Sentence, Error>>,
-) -> Result<(), Error> {
+    reader1: impl IntoIterator<Item = Result<Sentence, IOError>>,
+    reader2: impl IntoIterator<Item = Result<Sentence, IOError>>,
+) -> Result<()> {
     let mut labeled_correct = 0;
     let mut unlabeled_correct = 0;
     let mut total = 0;
@@ -177,8 +173,8 @@ fn dependency_eval(
 
     for (sent1, sent2) in reader1.into_iter().zip(reader2.into_iter()) {
         let (sent1, sent2) = (
-            sent1.or_exit("Cannot read sentence from gold treebank", 1),
-            sent2.or_exit("Cannot read sentence from predicted treebank", 1),
+            sent1.context("Cannot read sentence from gold treebank")?,
+            sent2.context("Cannot read sentence from predicted treebank")?,
         );
 
         ensure!(
@@ -253,7 +249,7 @@ fn print_dep_result(desc: &str, correct: usize, total: usize) {
     );
 }
 
-fn process_layer_callbacks(layers: &str) -> Result<Vec<LayerCallback>, Error> {
+fn process_layer_callbacks(layers: &str) -> Result<Vec<LayerCallback>> {
     let mut callbacks = Vec::new();
     for layer_str in layers.split(',') {
         match layer_callback(layer_str) {

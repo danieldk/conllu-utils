@@ -1,9 +1,10 @@
 use std::io::BufWriter;
 
+use anyhow::{Context, Result};
 use clap::{App, Arg, ArgMatches};
 use conllu::graph::{Node, Sentence};
 use conllu::io::{Reader, WriteSentence, Writer};
-use stdinout::{Input, OrExit, Output};
+use stdinout::{Input, Output};
 
 use crate::traits::{ConlluApp, ConlluPipelineApp};
 use crate::unicode::{simplify_unicode, Normalization};
@@ -46,34 +47,41 @@ impl ConlluApp for CleanupApp {
             )
     }
 
-    fn parse(matches: &ArgMatches) -> Self {
+    fn parse(matches: &ArgMatches) -> Result<Self> {
         let input = Input::from(matches.value_of(Self::INPUT));
         let output = Output::from(matches.value_of(Self::OUTPUT));
         let normalization = matches
             .value_of(NORMALIZATION)
-            .map(|n| normalization_from(n).or_exit(format!("Unknown normalization: {}", n), 1))
+            .map(|n| normalization_from(n).context(format!("Unknown normalization: {}", n)))
+            .transpose()?
             .unwrap_or(Normalization::None);
 
-        CleanupApp {
+        Ok(CleanupApp {
             input,
             output,
             normalization,
-        }
+        })
     }
 
-    fn run(&self) {
-        let reader = Reader::new(self.input.buf_read().or_exit("Cannot open input corpus", 1));
+    fn run(&self) -> Result<()> {
+        let reader = Reader::new(
+            self.input
+                .buf_read()
+                .context("Cannot open input treebank")?,
+        );
         let mut writer = Writer::new(BufWriter::new(
-            self.output.write().or_exit("Cannot open output corpus", 1),
+            self.output.write().context("Cannot open output treebank")?,
         ));
 
         for sentence in reader {
-            let mut sentence = sentence.or_exit("Cannot read sentence", 1);
+            let mut sentence = sentence.context("Cannot read sentence")?;
             cleanup(&mut sentence, self.normalization);
             writer
                 .write_sentence(&sentence)
-                .or_exit("Cannot write sentence", 1);
+                .context("Cannot write sentence")?;
         }
+
+        Ok(())
     }
 }
 
