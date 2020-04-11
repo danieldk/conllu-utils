@@ -3,13 +3,12 @@ use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
+use anyhow::{bail, ensure, Context, Result};
 use clap::{App, Arg, ArgMatches};
 use colored::Colorize;
 use conllu::graph::Sentence;
 use conllu::io::Reader;
 use conllu::token::Tokens;
-use failure::{bail, ensure, Error};
-use stdinout::OrExit;
 
 use crate::layer::{layer_callback, LayerCallback};
 use crate::traits::ConlluApp;
@@ -59,40 +58,40 @@ impl ConlluApp for CompareApp {
             )
     }
 
-    fn parse(matches: &ArgMatches) -> Self {
+    fn parse(matches: &ArgMatches) -> Result<Self> {
         let treebank_1 = matches.value_of(TREEBANK_1).unwrap().to_owned();
         let treebank_2 = matches.value_of(TREEBANK_2).unwrap().to_owned();
 
         let force_color = matches.is_present(FORCE_COLOR);
 
         let layer_callbacks = process_layer_callbacks(matches.value_of(LAYER).unwrap())
-            .or_exit("Cannot parse layer(s) to compare", 1);
+            .context("Cannot parse layer(s) to compare")?;
         let show_callbacks = process_layer_callbacks(matches.value_of(SHOW).unwrap())
-            .or_exit("Cannot parse layer(s) to show", 1);
+            .context("Cannot parse layer(s) to show")?;
 
-        CompareApp {
+        Ok(CompareApp {
             force_color,
             layer_callbacks,
             show_callbacks,
             treebank_1,
             treebank_2,
-        }
+        })
     }
 
-    fn run(&self) {
+    fn run(&self) -> Result<()> {
         if self.force_color {
             colored::control::set_override(true);
         }
 
-        let reader1 = Reader::new(BufReader::new(File::open(&self.treebank_1).or_exit(
-            format!("Cannot open first treebank: {}", self.treebank_1),
-            1,
-        )));
+        let reader1 = Reader::new(BufReader::new(
+            File::open(&self.treebank_1)
+                .context(format!("Cannot open first treebank: {}", self.treebank_1))?,
+        ));
 
-        let reader2 = Reader::new(BufReader::new(File::open(&self.treebank_2).or_exit(
-            format!("Cannot open first treebank: {}", self.treebank_2),
-            1,
-        )));
+        let reader2 = Reader::new(BufReader::new(
+            File::open(&self.treebank_2)
+                .context(format!("Cannot open first treebank: {}", self.treebank_2))?,
+        ));
 
         compare_sentences(
             reader1,
@@ -100,11 +99,11 @@ impl ConlluApp for CompareApp {
             &self.layer_callbacks,
             &self.show_callbacks,
         )
-        .or_exit("Cannot compare sentences", 1);
+        .context("Cannot compare sentences")
     }
 }
 
-fn process_layer_callbacks(layers: &str) -> Result<Vec<LayerCallback>, Error> {
+fn process_layer_callbacks(layers: &str) -> Result<Vec<LayerCallback>> {
     let mut callbacks = Vec::new();
     for layer_str in layers.split(',') {
         match layer_callback(layer_str) {
@@ -123,9 +122,12 @@ fn compare_sentences(
     reader2: Reader<impl BufRead>,
     diff_callbacks: &[LayerCallback],
     show_callbacks: &[LayerCallback],
-) -> Result<(), Error> {
+) -> Result<()> {
     for (sent1, sent2) in reader1.into_iter().zip(reader2.into_iter()) {
-        let (sent1, sent2) = (sent1?, sent2?);
+        let (sent1, sent2) = (
+            sent1.context("Cannot read sentence from first treebank")?,
+            sent2.context("Cannot read sentence from second treebank")?,
+        );
 
         let diff = diff_indices(&sent1, &sent2, diff_callbacks)?;
 
@@ -172,7 +174,7 @@ fn diff_indices(
     sentence1: &Sentence,
     sentence2: &Sentence,
     diff_callbacks: &[LayerCallback],
-) -> Result<BTreeSet<usize>, Error> {
+) -> Result<BTreeSet<usize>> {
     ensure!(
         sentence1.len() == sentence2.len(),
         "Different number of tokens: {} {}",

@@ -1,5 +1,6 @@
 use std::io::stdout;
 
+use anyhow::Result;
 use clap::{crate_version, App, AppSettings, Arg, Shell, SubCommand};
 
 pub mod io;
@@ -16,7 +17,7 @@ static DEFAULT_CLAP_SETTINGS: &[AppSettings] = &[
     AppSettings::SubcommandRequiredElseHelp,
 ];
 
-fn main() {
+fn main() -> Result<()> {
     // Known subapplications.
     let apps = vec![
         subcommands::AccuracyApp::app(),
@@ -44,7 +45,7 @@ fn main() {
 
     match matches.subcommand_name().unwrap() {
         "accuracy" => {
-            subcommands::AccuracyApp::parse(matches.subcommand_matches("accuracy").unwrap()).run()
+            subcommands::AccuracyApp::parse(matches.subcommand_matches("accuracy").unwrap())?.run()
         }
         "completions" => {
             let shell = matches
@@ -53,25 +54,29 @@ fn main() {
                 .value_of("shell")
                 .unwrap();
             write_completion_script(cli, shell.parse::<Shell>().unwrap());
+            Ok(())
         }
         "cleanup" => {
-            subcommands::CleanupApp::parse(matches.subcommand_matches("cleanup").unwrap()).run()
+            subcommands::CleanupApp::parse(matches.subcommand_matches("cleanup").unwrap())?.run()
         }
         "compare" => {
-            subcommands::CompareApp::parse(matches.subcommand_matches("compare").unwrap()).run()
+            subcommands::CompareApp::parse(matches.subcommand_matches("compare").unwrap())?.run()
         }
         "from-text" => {
-            subcommands::FromTextApp::parse(matches.subcommand_matches("from-text").unwrap()).run()
+            subcommands::FromTextApp::parse(matches.subcommand_matches("from-text").unwrap())?.run()
         }
-        "merge" => subcommands::MergeApp::parse(matches.subcommand_matches("merge").unwrap()).run(),
+        "merge" => {
+            subcommands::MergeApp::parse(matches.subcommand_matches("merge").unwrap())?.run()
+        }
         "partition" => {
-            subcommands::PartitionApp::parse(matches.subcommand_matches("partition").unwrap()).run()
+            subcommands::PartitionApp::parse(matches.subcommand_matches("partition").unwrap())?
+                .run()
         }
         "shuffle" => {
-            subcommands::ShuffleApp::parse(matches.subcommand_matches("shuffle").unwrap()).run()
+            subcommands::ShuffleApp::parse(matches.subcommand_matches("shuffle").unwrap())?.run()
         }
         "to-text" => {
-            subcommands::ToTextApp::parse(matches.subcommand_matches("to-text").unwrap()).run()
+            subcommands::ToTextApp::parse(matches.subcommand_matches("to-text").unwrap())?.run()
         }
         _unknown => unreachable!(),
     }

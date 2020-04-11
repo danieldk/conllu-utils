@@ -1,9 +1,10 @@
 use std::borrow::Cow;
 use std::io::{BufWriter, Write};
 
+use anyhow::{Context, Result};
 use clap::{App, Arg, ArgMatches};
 use itertools::Itertools;
-use stdinout::{Input, OrExit, Output};
+use stdinout::{Input, Output};
 
 use crate::layer::{layer_callback, LayerCallback};
 use crate::traits::{ConlluApp, ConlluPipelineApp};
@@ -31,26 +32,31 @@ impl ConlluApp for ToTextApp {
             )
     }
 
-    fn parse(matches: &ArgMatches) -> Self {
+    fn parse(matches: &ArgMatches) -> Result<Self> {
         let input = Input::from(matches.value_of(Self::INPUT));
         let output = Output::from(matches.value_of(Self::OUTPUT));
 
         let layer = matches.value_of(LAYER).unwrap();
-        let layer_callback = layer_callback(layer).or_exit(format!("Unknown layer: {}", layer), 1);
+        let layer_callback = layer_callback(layer).context(format!("Unknown layer: {}", layer))?;
 
-        ToTextApp {
+        Ok(ToTextApp {
             input,
             output,
             layer_callback,
-        }
+        })
     }
 
-    fn run(&self) {
-        let reader = conllu::io::Reader::new(self.input.buf_read().or_exit("Cannot open input", 1));
-        let mut writer = BufWriter::new(self.output.write().or_exit("Cannot open output", 1));
+    fn run(&self) -> Result<()> {
+        let reader =
+            conllu::io::Reader::new(self.input.buf_read().context("Cannot open treebank")?);
+        let mut writer = BufWriter::new(
+            self.output
+                .write()
+                .context("Cannot open output for writing")?,
+        );
 
         for sentence in reader {
-            let sentence = sentence.or_exit("Cannot read sentence", 1);
+            let sentence = sentence.context("Cannot read sentence")?;
 
             writeln!(
                 writer,
@@ -62,7 +68,9 @@ impl ConlluApp for ToTextApp {
                         .unwrap_or_else(|| "_".to_owned())))
                     .join(" ")
             )
-            .or_exit("Cannot write sentence", 1);
+            .context("Cannot write sentence")?;
         }
+
+        Ok(())
     }
 }

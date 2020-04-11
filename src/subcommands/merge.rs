@@ -1,8 +1,9 @@
 use std::io::BufWriter;
 
+use anyhow::{Context, Result};
 use clap::{App, Arg, ArgMatches};
 use conllu::io::{WriteSentence, Writer};
-use stdinout::{OrExit, Output};
+use stdinout::Output;
 
 use crate::io::open_reader;
 use crate::traits::ConlluApp;
@@ -33,7 +34,7 @@ impl ConlluApp for MergeApp {
             )
     }
 
-    fn parse(matches: &ArgMatches) -> Self {
+    fn parse(matches: &ArgMatches) -> Result<Self> {
         let inputs = matches
             .values_of(INPUTS)
             .unwrap()
@@ -41,30 +42,32 @@ impl ConlluApp for MergeApp {
             .collect();
         let output = Output::from(matches.value_of(OUTPUT));
 
-        MergeApp { inputs, output }
+        Ok(MergeApp { inputs, output })
     }
 
-    fn run(&self) {
+    fn run(&self) -> Result<()> {
         let mut writer = Writer::new(BufWriter::new(
             self.output
                 .write()
-                .or_exit("Cannot open output for writing", 1),
+                .context("Cannot open output for writing")?,
         ));
 
         copy_sents(&mut writer, &self.inputs)
     }
 }
 
-fn copy_sents(writer: &mut impl WriteSentence, filenames: &[String]) {
+fn copy_sents(writer: &mut impl WriteSentence, filenames: &[String]) -> Result<()> {
     for filename in filenames {
         let reader =
-            open_reader(&filename).or_exit(format!("Cannot open '{}' for reading", filename), 1);
+            open_reader(&filename).context(format!("Cannot open '{}' for reading", filename))?;
 
         for sentence in reader {
-            let sentence = sentence.or_exit("Cannot read sentence", 1);
+            let sentence = sentence.context(format!("Cannot read sentence from: {}", filename))?;
             writer
                 .write_sentence(&sentence)
-                .or_exit("Cannot write sentence", 1);
+                .context("Cannot write sentence")?;
         }
     }
+
+    Ok(())
 }
