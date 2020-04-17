@@ -150,9 +150,9 @@ dependencies = [
 
 [[package]]
 name = "hermit-abi"
-version = "0.1.8"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1010591b26bbfe835e9faeabeb11866061cc7dcebffd56ad7d0942d0e61aefd8"
+checksum = "8a0d737e0f947a1864e93d33fdef4af8445a00d1ed8dc0c8ddb73139ea6abf15"
 dependencies = [
  "libc",
 ]
@@ -183,9 +183,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.68"
+version = "0.2.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dea0c0405123bba743ee3f91f49b1c7cfb684eef0da0a50110f758ccf24cdff0"
+checksum = "99e85c08494b21a9054e7fe1374a732aeadaff3980b6990b94bfd3a70f690005"
 
 [[package]]
 name = "miniz_oxide"
@@ -214,9 +214,9 @@ checksum = "74490b50b9fbe561ac330df47c08f3f33073d2d00c150f719147d7c54522fa1b"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.9"
+version = "1.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c09721c6781493a2a492a96b5a5bf19b65917fe6728884e7c44dd0c60ca3435"
+checksum = "df246d292ff63439fea9bc8c0a270bed0e390d5ebd4db4ba15aba81111b5abe3"
 dependencies = [
  "unicode-xid",
 ]
@@ -282,15 +282,15 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.2.0"
+version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c2fb2ec9bcd216a5b0d0ccf31ab17b5ed1d627960edff65bbe95d3ce221cefc"
+checksum = "05720e22615919e4734f6a99ceae50d00226c3c5aca406e102ebc33298214e0a"
 
 [[package]]
 name = "stdinout"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29f1026ef7b2ded56453d708809e15f148b7f5b6a51e1ee0237964881ab85680"
+checksum = "731d3aab9a724e1509adb463b6c4e320bc4b86c49766c96a321c0d7c3e5efea1"
 
 [[package]]
 name = "strsim"
@@ -320,18 +320,18 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.14"
+version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f0570dc61221295909abdb95c739f2e74325e14293b2026b0a7e195091ec54ae"
+checksum = "54b3d3d2ff68104100ab257bb6bb0cb26c901abe4bd4ba15961f3bf867924012"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.14"
+version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "227362df41d566be41a28f64401e07a043157c21c14b9785a0d8e256f940a8fd"
+checksum = "ca972988113b7715266f91250ddb98070d033c62a011fa0fcc57434a649310dd"
 dependencies = [
  "proc-macro2",
  "quote",
