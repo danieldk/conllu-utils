@@ -77,7 +77,7 @@ pub fn simplify_unicode_punct(c: char) -> Conversion {
         '‸' => Conversion::Char('^'),
         '‹' => Conversion::Char('<'),
         '›' => Conversion::Char('>'),
-        '‽' => Conversion::Char('?'),
+        '‽' => Conversion::String("?!".to_string()),
         '⁄' => Conversion::Char('/'),
         '⁎' => Conversion::Char('*'),
         '⁒' => Conversion::Char('%'),
