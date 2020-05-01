@@ -12,10 +12,11 @@ use unicode_categories::UnicodeCategories;
 use crate::layer::{layer_callback, LayerCallback};
 use crate::traits::ConlluApp;
 
+const ATTACHMENT_SCORES: &str = "ATTACHMENT_SCORES";
 const GOLD_TREEBANK: &str = "GOLD_TREEBANK";
 const FEATURE: &str = "FEATURE";
-const ATTACHMENT_SCORES: &str = "ATTACHMENT_SCORES";
 const LAYER: &str = "LAYER";
+const MISC: &str = "MISC";
 const PREDICTED_TREEBANK: &str = "PREDICTED_TREEBANK";
 
 pub enum Evaluation {
@@ -60,9 +61,15 @@ impl ConlluApp for AccuracyApp {
                     .long("feature")
                     .takes_value(true),
             )
+            .arg(
+                Arg::with_name(MISC)
+                    .short("m")
+                    .long("misc")
+                    .takes_value(true),
+            )
             .group(
                 ArgGroup::with_name("source")
-                    .args(&[ATTACHMENT_SCORES, FEATURE, LAYER])
+                    .args(&[ATTACHMENT_SCORES, FEATURE, LAYER, MISC])
                     .required(true),
             )
     }
@@ -75,12 +82,16 @@ impl ConlluApp for AccuracyApp {
             matches.is_present(ATTACHMENT_SCORES),
             matches.value_of(LAYER),
             matches.value_of(FEATURE),
+            matches.value_of(MISC),
         ) {
-            (false, Some(layer), None) => Evaluation::Callbacks(
+            (false, Some(layer), None, None) => Evaluation::Callbacks(
                 process_layer_callbacks(layer).context("Cannot parse layer(s)")?,
             ),
-            (false, None, Some(feature)) => Evaluation::Callbacks(vec![feature_callback(feature)]),
-            (true, None, None) => Evaluation::AttachmentScore,
+            (false, None, Some(feature), None) => {
+                Evaluation::Callbacks(vec![feature_callback(feature)])
+            }
+            (false, None, None, Some(misc)) => Evaluation::Callbacks(vec![misc_callback(misc)]),
+            (true, None, None, None) => Evaluation::AttachmentScore,
             _ => unreachable!(),
         };
 
@@ -235,6 +246,19 @@ fn feature_callback(feature: impl Into<String>) -> LayerCallback {
         token
             .features()
             .get(&feature)
+            .map(|s| Cow::Borrowed(s.as_str()))
+    })
+}
+
+fn misc_callback(feature: impl Into<String>) -> LayerCallback {
+    let feature = feature.into();
+
+    Box::new(move |token| {
+        token
+            .misc()
+            .get(&feature)
+            .map(Option::as_ref)
+            .unwrap_or(None)
             .map(|s| Cow::Borrowed(s.as_str()))
     })
 }
