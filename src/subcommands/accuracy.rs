@@ -13,8 +13,9 @@ use crate::layer::{layer_callback, LayerCallback};
 use crate::traits::ConlluApp;
 
 const ATTACHMENT_SCORES: &str = "ATTACHMENT_SCORES";
-const GOLD_TREEBANK: &str = "GOLD_TREEBANK";
+const DEFAULT: &str = "DEFAULT";
 const FEATURE: &str = "FEATURE";
+const GOLD_TREEBANK: &str = "GOLD_TREEBANK";
 const LAYER: &str = "LAYER";
 const MISC: &str = "MISC";
 const PREDICTED_TREEBANK: &str = "PREDICTED_TREEBANK";
@@ -25,6 +26,7 @@ pub enum Evaluation {
 }
 
 pub struct AccuracyApp {
+    default: Option<String>,
     evaluation: Evaluation,
     gold_treebank: String,
     predicted_treebank: String,
@@ -48,6 +50,13 @@ impl ConlluApp for AccuracyApp {
                 Arg::with_name(ATTACHMENT_SCORES)
                     .short("a")
                     .long("attachment"),
+            )
+            .arg(
+                Arg::with_name(DEFAULT)
+                    .short("d")
+                    .long("default")
+                    .takes_value(true)
+                    .help("Default value when no value is present"),
             )
             .arg(
                 Arg::with_name(LAYER)
@@ -78,6 +87,8 @@ impl ConlluApp for AccuracyApp {
         let gold_treebank = matches.value_of(GOLD_TREEBANK).unwrap().to_owned();
         let predicted_treebank = matches.value_of(PREDICTED_TREEBANK).unwrap().to_owned();
 
+        let default = matches.value_of(DEFAULT).map(|s| s.to_owned());
+
         let evaluation = match (
             matches.is_present(ATTACHMENT_SCORES),
             matches.value_of(LAYER),
@@ -96,6 +107,7 @@ impl ConlluApp for AccuracyApp {
         };
 
         Ok(AccuracyApp {
+            default,
             evaluation,
             gold_treebank,
             predicted_treebank,
@@ -116,9 +128,12 @@ impl ConlluApp for AccuracyApp {
         let predicted_reader = Reader::new(BufReader::new(predicted_file));
 
         match &self.evaluation {
-            Evaluation::Callbacks(callbacks) => {
-                callback_eval(gold_reader, predicted_reader, callbacks)
-            }
+            Evaluation::Callbacks(callbacks) => callback_eval(
+                gold_reader,
+                predicted_reader,
+                callbacks,
+                self.default.as_deref(),
+            ),
             Evaluation::AttachmentScore => dependency_eval(gold_reader, predicted_reader),
         }
     }
@@ -128,6 +143,7 @@ fn callback_eval(
     reader1: impl IntoIterator<Item = Result<Sentence, IOError>>,
     reader2: impl IntoIterator<Item = Result<Sentence, IOError>>,
     diff_callbacks: &[LayerCallback],
+    default: Option<&str>,
 ) -> Result<()> {
     let mut total = 0;
     let mut correct = 0;
@@ -153,8 +169,19 @@ fn callback_eval(
             for layer_callback in diff_callbacks {
                 total += 1;
 
-                if layer_callback(token1) == layer_callback(token2) {
-                    correct += 1
+                match default {
+                    Some(default) => {
+                        if layer_callback(token1).unwrap_or_else(|| Cow::Borrowed(default))
+                            == layer_callback(token2).unwrap_or_else(|| Cow::Borrowed(default))
+                        {
+                            correct += 1
+                        }
+                    }
+                    None => {
+                        if layer_callback(token1) == layer_callback(token2) {
+                            correct += 1
+                        }
+                    }
                 }
             }
         }
