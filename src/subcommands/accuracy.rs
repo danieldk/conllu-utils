@@ -38,43 +38,48 @@ impl ConlluApp for AccuracyApp {
             .about("Compute the accuracy of a layer")
             .arg(
                 Arg::with_name(GOLD_TREEBANK)
-                    .help("Input treebanks")
+                    .help("Gold standard treebank")
                     .required(true),
             )
             .arg(
                 Arg::with_name(PREDICTED_TREEBANK)
-                    .help("Input treebanks")
+                    .help("Non-gold standard treebank")
                     .required(true),
             )
             .arg(
                 Arg::with_name(ATTACHMENT_SCORES)
                     .short("a")
-                    .long("attachment"),
+                    .long("attachment")
+                    .help("Default value when no value is present"),
             )
             .arg(
                 Arg::with_name(DEFAULT)
                     .short("d")
                     .long("default")
                     .takes_value(true)
+                    .conflicts_with(ATTACHMENT_SCORES)
                     .help("Default value when no value is present"),
             )
             .arg(
                 Arg::with_name(LAYER)
                     .short("l")
                     .long("layer")
-                    .takes_value(true),
+                    .takes_value(true)
+                    .help("Evaluate a layer"),
             )
             .arg(
                 Arg::with_name(FEATURE)
                     .short("f")
                     .long("feature")
-                    .takes_value(true),
+                    .takes_value(true)
+                    .help("Evaluate a morphological feature"),
             )
             .arg(
                 Arg::with_name(MISC)
                     .short("m")
                     .long("misc")
-                    .takes_value(true),
+                    .takes_value(true)
+                    .help("Evaluate miscellaneous feature"),
             )
             .group(
                 ArgGroup::with_name("source")
