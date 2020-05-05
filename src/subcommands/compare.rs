@@ -41,20 +41,27 @@ impl ConlluApp for CompareApp {
                     .help("Second treebank")
                     .required(true),
             )
-            .arg(Arg::with_name(FORCE_COLOR).short("c").long("force-color"))
+            .arg(
+                Arg::with_name(FORCE_COLOR)
+                    .short("c")
+                    .long("force-color")
+                    .help("Force colored output"),
+            )
             .arg(
                 Arg::with_name(LAYER)
                     .short("l")
                     .long("layer")
                     .takes_value(true)
-                    .default_value("upos"),
+                    .default_value("upos")
+                    .help("Compare a layer"),
             )
             .arg(
                 Arg::with_name(SHOW)
                     .short("s")
                     .long("show")
                     .takes_value(true)
-                    .default_value("form"),
+                    .default_value("form")
+                    .help("Compare a layer"),
             )
     }
 
