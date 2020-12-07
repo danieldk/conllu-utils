@@ -2,7 +2,10 @@
   description = "CoNLL-U utilities";
 
   inputs = {
-    naersk.url = "github:nmattia/naersk/master";
+    naersk = {
+      url = "github:nmattia/naersk/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs.url = "github:NixOS/nixpkgs-channels/nixos-unstable-small";
     utils.url = "github:numtide/flake-utils";
   };
