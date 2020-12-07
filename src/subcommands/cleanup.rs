@@ -2,9 +2,9 @@ use std::io::BufWriter;
 
 use anyhow::{Context, Result};
 use clap::{App, Arg, ArgMatches};
-use conllu::graph::{Node, Sentence};
 use conllu::io::{Reader, WriteSentence, Writer};
 use stdinout::{Input, Output};
+use udgraph::graph::{Node, Sentence};
 
 use crate::traits::{ConlluApp, ConlluPipelineApp};
 use crate::unicode::{simplify_unicode, Normalization};

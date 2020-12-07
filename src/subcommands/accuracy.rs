@@ -4,9 +4,10 @@ use std::io::BufReader;
 
 use anyhow::{bail, ensure, format_err, Context, Result};
 use clap::{App, Arg, ArgGroup, ArgMatches};
-use conllu::graph::{Node, Sentence};
+use conllu::display::ConlluSentence;
 use conllu::io::Reader;
 use conllu::IOError;
+use udgraph::graph::{Node, Sentence};
 use unicode_categories::UnicodeCategories;
 
 use crate::layer::{layer_callback, LayerCallback};
@@ -236,14 +237,20 @@ fn dependency_eval(
                 nopunct_total += 1;
             }
 
-            let gold_triple = sent1
-                .dep_graph()
-                .head(idx)
-                .ok_or_else(|| format_err!("Token without head: {} in:\n{}", idx, sent1))?;
-            let predicted_triple = sent2
-                .dep_graph()
-                .head(idx)
-                .ok_or_else(|| format_err!("Token without head: {} in:\n{}", idx, sent1))?;
+            let gold_triple = sent1.dep_graph().head(idx).ok_or_else(|| {
+                format_err!(
+                    "Token without head: {} in:\n{}",
+                    idx,
+                    ConlluSentence::borrowed(&sent1)
+                )
+            })?;
+            let predicted_triple = sent2.dep_graph().head(idx).ok_or_else(|| {
+                format_err!(
+                    "Token without head: {} in:\n{}",
+                    idx,
+                    ConlluSentence::borrowed(&sent1)
+                )
+            })?;
 
             if predicted_triple == gold_triple {
                 labeled_correct += 1;

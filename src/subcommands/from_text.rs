@@ -2,10 +2,10 @@ use std::io::{BufRead, BufWriter};
 
 use anyhow::{Context, Result};
 use clap::{App, ArgMatches};
-use conllu::graph::Sentence;
 use conllu::io::WriteSentence;
-use conllu::token::TokenBuilder;
 use stdinout::{Input, Output};
+use udgraph::graph::Sentence;
+use udgraph::token::TokenBuilder;
 
 use crate::traits::{ConlluApp, ConlluPipelineApp};
 

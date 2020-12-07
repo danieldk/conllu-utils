@@ -6,9 +6,9 @@ use std::io::{BufRead, BufReader};
 use anyhow::{bail, ensure, Context, Result};
 use clap::{App, Arg, ArgMatches};
 use colored::Colorize;
-use conllu::graph::Sentence;
 use conllu::io::Reader;
-use conllu::token::Tokens;
+use udgraph::graph::Sentence;
+use udgraph::token::Tokens;
 
 use crate::layer::{layer_callback, LayerCallback};
 use crate::traits::ConlluApp;
