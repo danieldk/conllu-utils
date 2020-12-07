@@ -6,7 +6,7 @@
       url = "github:nmattia/naersk/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixpkgs.url = "github:NixOS/nixpkgs-channels/nixos-unstable-small";
+    nixpkgs.url = "github:NixOS/nixpkgs/release-20.09";
     utils.url = "github:numtide/flake-utils";
   };
 
