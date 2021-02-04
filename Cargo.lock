@@ -82,7 +82,7 @@ version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6028c5904fccbda78f6ed6c50630ff5c8b58f58dc9df8ecab380e3634b8e6f37"
 dependencies = [
- "itertools",
+ "itertools 0.9.0",
  "thiserror",
  "udgraph",
 ]
@@ -96,7 +96,7 @@ dependencies = [
  "colored",
  "conllu",
  "flate2",
- "itertools",
+ "itertools 0.10.0",
  "rand",
  "rand_xorshift",
  "stdinout",
@@ -172,6 +172,15 @@ name = "itertools"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "284f18f85651fe11e8a991b2adb42cb078325c996ed026d994719efcfca1d54b"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37d572918e350e82412fe766d24b15e6682fb2ed2bbe018280caa810397cb319"
 dependencies = [
  "either",
 ]
