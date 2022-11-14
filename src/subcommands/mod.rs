@@ -7,6 +7,9 @@ pub use cleanup::CleanupApp;
 mod compare;
 pub use compare::CompareApp;
 
+mod cycle;
+pub use cycle::CycleApp;
+
 mod from_text;
 pub use from_text::FromTextApp;
 
