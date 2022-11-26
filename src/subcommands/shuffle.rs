@@ -42,7 +42,7 @@ impl ConlluApp for ShuffleApp {
             let seed_val: u32 = seed_str
                 .parse()
                 .context(format!("Cannot not parse '{}' as an integer", seed_str))?;
-            (&mut seed[..4]).copy_from_slice(&seed_val.to_be_bytes());
+            seed[..4].copy_from_slice(&seed_val.to_be_bytes());
             seed
         } else {
             rand::thread_rng().gen()
