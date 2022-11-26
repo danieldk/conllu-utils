@@ -177,8 +177,8 @@ fn callback_eval(
 
                 match default {
                     Some(default) => {
-                        if layer_callback(token1).unwrap_or_else(|| Cow::Borrowed(default))
-                            == layer_callback(token2).unwrap_or_else(|| Cow::Borrowed(default))
+                        if layer_callback(token1).unwrap_or(Cow::Borrowed(default))
+                            == layer_callback(token2).unwrap_or(Cow::Borrowed(default))
                         {
                             correct += 1
                         }
