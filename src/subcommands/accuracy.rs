@@ -6,7 +6,7 @@ use anyhow::{bail, ensure, format_err, Context, Result};
 use clap::{App, Arg, ArgGroup, ArgMatches};
 use conllu::display::ConlluSentence;
 use conllu::io::Reader;
-use conllu::IOError;
+use conllu::Error;
 use udgraph::graph::{Node, Sentence};
 use unicode_categories::UnicodeCategories;
 
@@ -146,8 +146,8 @@ impl ConlluApp for AccuracyApp {
 }
 
 fn callback_eval(
-    reader1: impl IntoIterator<Item = Result<Sentence, IOError>>,
-    reader2: impl IntoIterator<Item = Result<Sentence, IOError>>,
+    reader1: impl IntoIterator<Item = Result<Sentence, Error>>,
+    reader2: impl IntoIterator<Item = Result<Sentence, Error>>,
     diff_callbacks: &[LayerCallback],
     default: Option<&str>,
 ) -> Result<()> {
@@ -204,8 +204,8 @@ fn callback_eval(
 }
 
 fn dependency_eval(
-    reader1: impl IntoIterator<Item = Result<Sentence, IOError>>,
-    reader2: impl IntoIterator<Item = Result<Sentence, IOError>>,
+    reader1: impl IntoIterator<Item = Result<Sentence, Error>>,
+    reader2: impl IntoIterator<Item = Result<Sentence, Error>>,
 ) -> Result<()> {
     let mut labeled_correct = 0;
     let mut unlabeled_correct = 0;
